@@ -1,4 +1,6 @@
 #include "PhysicsSystem.hpp"
+#include "Matrix.hpp"
+#include "Rotation.hpp"
 
 
 PhysicsSystem::PhysicsSystem()
@@ -23,7 +25,16 @@ void PhysicsSystem::Update(float delta_time, EntityManger& entity_manager, Compo
             Transform& transform = component_manager.GetComponent<Transform>(i);
             RigidBody& rigid_body = component_manager.GetComponent<RigidBody>(i);
 
-            
+            rigid_body.velocity.x += rigid_body.acceleration.x * delta_time;
+            rigid_body.velocity.y += rigid_body.acceleration.y * delta_time;
+            rigid_body.velocity.z += rigid_body.acceleration.z * delta_time;
+
+            Matrix rotation_matrix = CreateRotationMatrix(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+            Vector rotated_velocity = DotProduct(rotation_matrix, rigid_body.velocity);
+
+            transform.position.x += rotated_velocity.x * delta_time;
+            transform.position.y += rotated_velocity.y * delta_time;
+            transform.position.z += rotated_velocity.z * delta_time;
         }
     }
 }

@@ -3,7 +3,9 @@ add_executable(OutRunTheLion main.cpp
                              EntityManger.cpp
                              InputMap.cpp
                              InputSystem.cpp
-                             PlayerInputSystem.cpp)
+                             PlayerInputSystem.cpp
+                             PhysicsSystem.cpp
+                             RenderSystem.cpp)
 
 target_include_directories(OutRunTheLion PUBLIC ${CMAKE_SOURCE_DIR}/inc
                                                 ${SDL2_INCLUDE_DIRS}

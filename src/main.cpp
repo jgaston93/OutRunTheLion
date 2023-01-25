@@ -6,6 +6,8 @@
 #include "EntityManger.hpp"
 
 #include "PlayerInputSystem.hpp"
+#include "PhysicsSystem.hpp"
+#include "RenderSystem.hpp"
 
 int main(int argv, char* args[])
 {
@@ -31,6 +33,8 @@ int main(int argv, char* args[])
 
     InputSystem input_system(input_map);
     PlayerInputSystem player_input_system(input_map);
+    PhysicsSystem physics_system;
+    RenderSystem render_system;
 
     const uint32_t num_entities = 1;
     EntityManger entity_manager(num_entities);
@@ -75,6 +79,8 @@ int main(int argv, char* args[])
 
         input_system.Update(is_running);
         player_input_system.Update(entity_manager, component_manager);
+        physics_system.Update(delta_time, entity_manager, component_manager);
+        render_system.Update(renderer, entity_manager, component_manager);
         
         // Calculate time to sleep and sleep if necessary
         int next_frame_time = num_frames++ * MS_PER_FRAME;
