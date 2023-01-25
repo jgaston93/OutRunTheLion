@@ -4,7 +4,8 @@
 ComponentManager::ComponentManager(uint32_t num_entities) : m_transform_pool(num_entities),
                                                             m_rigid_body_pool(num_entities),
                                                             m_texture_pool(num_entities),
-                                                            m_player_input_pool(num_entities)
+                                                            m_player_input_pool(num_entities),
+                                                            m_bounding_box_pool(num_entities)
 {
 
 }
@@ -60,4 +61,16 @@ template <>
 PlayerInput& ComponentManager::GetComponent<PlayerInput>(uint32_t entity_id)
 {
     return m_player_input_pool.GetComponent(entity_id);
+}
+
+template <>
+void ComponentManager::AddComponent<BoundingBox>(uint32_t entity_id, BoundingBox component)
+{
+    m_bounding_box_pool.AddComponent(entity_id, component);
+}
+
+template <>
+BoundingBox& ComponentManager::GetComponent<BoundingBox>(uint32_t entity_id)
+{
+    return m_bounding_box_pool.GetComponent(entity_id);
 }

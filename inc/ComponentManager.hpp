@@ -6,6 +6,7 @@
 #include "Texture.hpp"
 #include "RigidBody.hpp"
 #include "PlayerInput.hpp"
+#include "BoundingBox.hpp"
 
 class ComponentManager
 {
@@ -24,6 +25,7 @@ class ComponentManager
     ComponentPool<Texture> m_texture_pool;
     ComponentPool<RigidBody> m_rigid_body_pool;
     ComponentPool<PlayerInput> m_player_input_pool;
+    ComponentPool<BoundingBox> m_bounding_box_pool;
 };
 
 #endif // COMPONENT_MANAGER_HPP
