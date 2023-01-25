@@ -24,7 +24,7 @@ void RenderSystem::Update(SDL_Renderer* renderer, EntityManger& entity_manager, 
 
         const std::vector< SDL_Vertex > verts =
         {
-            { SDL_FPoint{ transform.position.x, transform.position.y - 10 }, SDL_Color{ 255, 0, 0, 255 }, SDL_FPoint{ 0 }, },
+            { SDL_FPoint{ transform.position.x, transform.position.y- 10 }, SDL_Color{ 255, 0, 0, 255 }, SDL_FPoint{ 0 }, },
             { SDL_FPoint{ transform.position.x - 5, transform.position.y + 5 }, SDL_Color{ 0, 0, 255, 255 }, SDL_FPoint{ 0 }, },
             { SDL_FPoint{ transform.position.x + 5, transform.position.y + 5 }, SDL_Color{ 0, 255, 0, 255 }, SDL_FPoint{ 0 }, },
         };

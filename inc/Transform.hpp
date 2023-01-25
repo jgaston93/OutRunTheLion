@@ -5,9 +5,9 @@
 
 struct Transform
 {
-    Vector position;
-    Vector rotation;
-    Vector scale;
+    Vector3 position;
+    Vector3 rotation;
+    Vector3 scale;
 };
 
 #endif //TRANSFORM_HPP

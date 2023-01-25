@@ -23,25 +23,25 @@ void PlayerInputSystem::Update(EntityManger& entity_manager, ComponentManager& c
             PlayerInput& player_input = component_manager.GetComponent<PlayerInput>(i);
             RigidBody& rigid_body = component_manager.GetComponent<RigidBody>(i);
 
-            transform.rotation.z = 0;
-            rigid_body.acceleration.z = 0;
+            transform.rotation.x = 0;
+            rigid_body.acceleration.x = 0;
 
             if(m_input_map.IsPressed(player_input.steer_left))
             {
-                transform.rotation.z -= player_input.rotation;
+                transform.rotation.x -= player_input.rotation;
             }
             else if(m_input_map.IsPressed(player_input.steer_right))
             {
-                transform.rotation.z += player_input.rotation;
+                transform.rotation.x += player_input.rotation;
             }
 
             if(m_input_map.IsPressed(player_input.accelerate))
             {
-                rigid_body.acceleration.z += player_input.acceleration;
+                rigid_body.acceleration.x += player_input.acceleration;
             }
             else if(m_input_map.IsPressed(player_input.brake))
             {
-                rigid_body.acceleration.z -= player_input.acceleration;
+                rigid_body.acceleration.x -= player_input.acceleration;
             }
 
         }

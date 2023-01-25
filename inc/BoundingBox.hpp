@@ -5,7 +5,7 @@
 
 struct BoundingBox
 {
-    Vector bouding_box;
+    Vector3 bouding_box;
 };
 
 #endif // BOUDING_BOX_HPP

@@ -5,8 +5,8 @@
 
 struct RigidBody
 {
-    Vector acceleration;
-    Vector velocity;
+    Vector3 acceleration;
+    Vector3 velocity;
 };
 
 #endif // RIGID_BOYD_HPP

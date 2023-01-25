@@ -29,8 +29,8 @@ void PhysicsSystem::Update(float delta_time, EntityManger& entity_manager, Compo
             rigid_body.velocity.y += rigid_body.acceleration.y * delta_time;
             rigid_body.velocity.z += rigid_body.acceleration.z * delta_time;
 
-            Matrix rotation_matrix = CreateRotationMatrix(transform.rotation.x, transform.rotation.y, transform.rotation.z);
-            Vector rotated_velocity = DotProduct(rotation_matrix, rigid_body.velocity);
+            Matrix3x3 rotation_matrix = CreateRotationMatrix(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+            Vector3 rotated_velocity = DotProduct(rotation_matrix, rigid_body.velocity);
 
             transform.position.x += rotated_velocity.x * delta_time;
             transform.position.y += rotated_velocity.y * delta_time;
