@@ -46,9 +46,28 @@ Vector3 DotProduct(Matrix3x3 m, Vector3 v)
     return result;
 }
 
-Matrix4x4 Multiply(Matrix4x4 m_1, Matrix4x4 m_2)
+Vector3 Normalize(Vector3 vec)
 {
-    Matrix4x4 result;
+    float magnitude = sqrtf(powf(vec.x, 2) + powf(vec.y, 2) + powf(vec.z, 2));
+    Vector3 result;
+    result.x = vec.x / magnitude;
+    result.y = vec.y / magnitude;
+    result.z = vec.z / magnitude;
+    return result;
+}
+
+Vector3 CrossProduct(Vector3 v_1, Vector3 v_2)
+{
+    Vector3 result;
+    result.x = v_1.y * v_2.z - v_1.z * v_2.y;
+    result.y = v_1.z * v_2.x - v_1.x * v_2.z;
+    result.z = v_1.x * v_2.y - v_1.y * v_2.x;
+    return result;
+}
+
+Matrix4 Multiply(Matrix4 m_1, Matrix4 m_2)
+{
+    Matrix4 result;
 
     result.m[0][0] = m_1.m[0][0] * m_2.m[0][0] + m_1.m[0][1] * m_2.m[1][0] + m_1.m[0][2] * m_2.m[2][0] + m_1.m[0][3] * m_2.m[3][0];
     result.m[0][1] = m_1.m[0][0] * m_2.m[0][1] + m_1.m[0][1] * m_2.m[1][1] + m_1.m[0][2] * m_2.m[2][1] + m_1.m[0][3] * m_2.m[3][1];
@@ -73,10 +92,24 @@ Matrix4x4 Multiply(Matrix4x4 m_1, Matrix4x4 m_2)
     return result;
 }
 
-Matrix4x4 CreateModelMatrix(Transform transform)
+Matrix4 LookAt(Vector3 eye, Vector3 at, Vector3 up)
 {
-    Matrix4x4 translation_matrix;
-    memset(&translation_matrix, 0, sizeof(Matrix4x4));
+    Vector3 z_axis;
+    z_axis.x = at.x - eye.x;
+    z_axis.y = at.y - eye.y;
+    z_axis.z = at.z - eye.z;
+    z_axis = Normalize(z_axis);
+    Vector3 x_axis = Normalize(CrossProduct(z_axis, up));
+    Vector3 y_axis = CrossProduct(x_axis, z_axis);
+    
+    Matrix4 result;
+
+}
+
+Matrix4 CreateModelMatrix(Transform transform)
+{
+    Matrix4 translation_matrix;
+    memset(&translation_matrix, 0, sizeof(Matrix4));
     translation_matrix.m[0][0] = 1;
     translation_matrix.m[0][3] = transform.position.x;
     translation_matrix.m[1][1] = 1;
@@ -85,8 +118,8 @@ Matrix4x4 CreateModelMatrix(Transform transform)
     translation_matrix.m[2][3] = transform.position.z;
     translation_matrix.m[3][3] = 1;
     
-    Matrix4x4 scale_matrix;
-    memset(&scale_matrix, 0, sizeof(Matrix4x4));
+    Matrix4 scale_matrix;
+    memset(&scale_matrix, 0, sizeof(Matrix4));
     scale_matrix.m[0][0] = transform.position.x;
     scale_matrix.m[1][1] = transform.position.y;
     scale_matrix.m[2][2] = transform.position.z;
@@ -95,7 +128,7 @@ Matrix4x4 CreateModelMatrix(Transform transform)
     Matrix3x3 rotation_matrix = CreateRotationMatrix(transform.rotation.x,
                                                      transform.rotation.y,
                                                      transform.rotation.z);
-    Matrix4x4 rotation_matrix_4x4;
+    Matrix4 rotation_matrix_4x4;
 
     rotation_matrix_4x4.m[0][0] = rotation_matrix.m[0][0];
     rotation_matrix_4x4.m[0][1] = rotation_matrix.m[0][1];
@@ -114,16 +147,16 @@ Matrix4x4 CreateModelMatrix(Transform transform)
     rotation_matrix_4x4.m[3][2] = rotation_matrix.m[0][2];
     rotation_matrix_4x4.m[3][3] = 1;
 
-    Matrix4x4 model_matrix = Multiply(Multiply(translation_matrix, rotation_matrix_4x4), scale_matrix);
+    Matrix4 model_matrix = Multiply(Multiply(translation_matrix, rotation_matrix_4x4), scale_matrix);
     return model_matrix;
 }
 
-Matrix4x4 CreateViewMatrix(Transform transform)
+Matrix4 CreateViewMatrix(Transform transform)
 {
     Matrix3x3 rotation_matrix = CreateRotationMatrix(-transform.rotation.x,
                                                      -transform.rotation.y,
                                                      -transform.rotation.z);
-    Matrix4x4 view_matrix;
+    Matrix4 view_matrix;
 
     view_matrix.m[0][0] = rotation_matrix.m[0][0];
     view_matrix.m[0][1] = rotation_matrix.m[0][1];
