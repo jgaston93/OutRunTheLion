@@ -1,11 +1,11 @@
 #ifndef BOUNDING_BOX_HPP
 #define BOUNDING_BOX_HPP
 
-#include "Vector.hpp"
+#include "linmath.h"
 
 struct BoundingBox
 {
-    Vector3 bouding_box;
+    vec3 bouding_box;
 };
 
 #endif // BOUDING_BOX_HPP

@@ -1,12 +1,12 @@
 #ifndef RIGID_BODY_HPP
 #define RIGID_BODY_HPP
 
-#include "Vector.hpp"
+#include "linmath.h"
 
 struct RigidBody
 {
-    Vector3 acceleration;
-    Vector3 velocity;
+    vec3 acceleration;
+    vec3 velocity;
 };
 
 #endif // RIGID_BOYD_HPP

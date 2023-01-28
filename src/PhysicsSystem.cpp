@@ -1,6 +1,6 @@
+#include <stdio.h>
+
 #include "PhysicsSystem.hpp"
-#include "Matrix.hpp"
-#include "Rotation.hpp"
 
 
 PhysicsSystem::PhysicsSystem()
@@ -20,21 +20,38 @@ void PhysicsSystem::Update(float delta_time, EntityManger& entity_manager, Compo
 
     for(uint32_t i = 0; i < num_entities; i++)
     {
-        if(entity_manager.GetEntityState(i) == EntityState::ACTIVE && entity_manager.GetEntitySignature(i) & PHYSICS_SYSTEM_SIGNATURE > 0)
+        if(entity_manager.GetEntityState(i) == EntityState::ACTIVE && 
+            ((entity_manager.GetEntitySignature(i) & PHYSICS_SYSTEM_SIGNATURE) == PHYSICS_SYSTEM_SIGNATURE))
         {
             Transform& transform = component_manager.GetComponent<Transform>(i);
             RigidBody& rigid_body = component_manager.GetComponent<RigidBody>(i);
 
-            rigid_body.velocity.x += rigid_body.acceleration.x * delta_time;
-            rigid_body.velocity.y += rigid_body.acceleration.y * delta_time;
-            rigid_body.velocity.z += rigid_body.acceleration.z * delta_time;
+            rigid_body.velocity[0] += rigid_body.acceleration[0] * delta_time * 0.9;
+            rigid_body.velocity[1] += rigid_body.acceleration[1] * delta_time * 0.9;
+            rigid_body.velocity[2] += rigid_body.acceleration[2] * delta_time * 0.9;
+            
+            if(rigid_body.velocity[2] > 0)
+            {
+                rigid_body.velocity[2] = 0;
+            }
+            else if(rigid_body.velocity[2] < -22)
+            {
+                rigid_body.velocity[2] = -22;
+            }
 
-            Matrix3x3 rotation_matrix = CreateRotationMatrix(transform.rotation.x, transform.rotation.y, transform.rotation.z);
-            Vector3 rotated_velocity = DotProduct(rotation_matrix, rigid_body.velocity);
+            mat4x4 rotation_matrix;
+            mat4x4_identity(rotation_matrix);
+            mat4x4_rotate_Z(rotation_matrix, rotation_matrix, transform.rotation[0] * M_PI / 180.0);
+            mat4x4_rotate_Y(rotation_matrix, rotation_matrix, transform.rotation[1] * M_PI / 180.0);
+            mat4x4_rotate_X(rotation_matrix, rotation_matrix, transform.rotation[2] * M_PI / 180.0);
 
-            transform.position.x += rotated_velocity.x * delta_time;
-            transform.position.y += rotated_velocity.y * delta_time;
-            transform.position.z += rotated_velocity.z * delta_time;
+            vec4 world_velocity;
+            vec4 body_velocity = { rigid_body.velocity[0], rigid_body.velocity[1], rigid_body.velocity[2], 1 };
+            mat4x4_mul_vec4(world_velocity, rotation_matrix, body_velocity);
+
+            transform.position[0] += world_velocity[0] * delta_time;
+            transform.position[1] += world_velocity[1] * delta_time;
+            transform.position[2] += world_velocity[2] * delta_time;
         }
     }
 }

@@ -1,13 +1,13 @@
 #ifndef TRANSFORM_HPP
 #define TRANSFORM_HPP
 
-#include "Vector.hpp"
+#include "linmath.h"
 
 struct Transform
 {
-    Vector3 position;
-    Vector3 rotation;
-    Vector3 scale;
+    vec3 position;
+    vec3 rotation;
+    vec3 scale;
 };
 
 #endif //TRANSFORM_HPP

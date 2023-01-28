@@ -1,7 +1,7 @@
 #ifndef INPUT_MAP_HPP
 #define INPUT_MAP_HPP
 
-#include "SDL.h"
+#include <stdint.h>
 
 class InputMap
 {
@@ -9,14 +9,14 @@ class InputMap
     InputMap(uint32_t m_num_inputs);
     ~InputMap();
 
-    void AddInput(SDL_Scancode input);
-    void SetIsPressed(SDL_Scancode input, bool is_pressed);
-    bool IsPressed(SDL_Scancode input);
+    void AddInput(uint32_t input);
+    void SetIsPressed(uint32_t input, bool is_pressed);
+    bool IsPressed(uint32_t input);
 
     private:
     const uint32_t m_max_num_inupts;
     uint32_t m_num_inputs;
-    SDL_Scancode* m_input_index_map;
+    uint32_t* m_input_index_map;
     bool* m_input_map;
 };
 

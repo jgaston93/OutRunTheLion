@@ -5,10 +5,10 @@
 InputMap::InputMap(uint32_t num_inputs) : m_max_num_inupts(num_inputs),
                                           m_num_inputs(0),
                                           m_input_map(new bool[num_inputs]),
-                                          m_input_index_map(new SDL_Scancode[num_inputs])
+                                          m_input_index_map(new uint32_t[num_inputs])
 {
     memset(m_input_map, 0, num_inputs * sizeof(bool));
-    memset(m_input_index_map, 0, num_inputs * sizeof(SDL_Scancode));
+    memset(m_input_index_map, 0, num_inputs * sizeof(uint32_t));
 }
 
 InputMap::~InputMap()
@@ -18,12 +18,12 @@ InputMap::~InputMap()
 }
 
 
-void InputMap::AddInput(SDL_Scancode input)
+void InputMap::AddInput(uint32_t input)
 {
     m_input_index_map[m_num_inputs++] = input;
 }
 
-void InputMap::SetIsPressed(SDL_Scancode input, bool is_pressed)
+void InputMap::SetIsPressed(uint32_t input, bool is_pressed)
 {
     for(uint32_t i = 0; i < m_num_inputs; i++)
     {
@@ -34,7 +34,7 @@ void InputMap::SetIsPressed(SDL_Scancode input, bool is_pressed)
     }
 }
 
-bool InputMap::IsPressed(SDL_Scancode input)
+bool InputMap::IsPressed(uint32_t input)
 {
     bool is_pressed = false;
 
