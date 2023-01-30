@@ -20,6 +20,7 @@ void PlayerInputSystem::handleMessage(Message message)
         uint32_t goal_entity_id = 0;
         bool player_found = false;
         bool goal_found = false;
+
         if(strcmp("goal", m_entity_manager->GetEntityTag(entity_1_id)))
         {
             goal_entity_id = entity_1_id;
@@ -30,6 +31,7 @@ void PlayerInputSystem::handleMessage(Message message)
             goal_entity_id = entity_2_id;
             goal_found = true;
         }
+
         if((m_entity_manager->GetEntitySignature(entity_1_id) & PLAYER_INPUT_SYSTEM_SIGNATURE) == PLAYER_INPUT_SYSTEM_SIGNATURE)
         {
             player_entity_id = entity_1_id;
@@ -43,7 +45,12 @@ void PlayerInputSystem::handleMessage(Message message)
         if(player_found)
         {
             PlayerInput& player_input = m_component_manager->GetComponent<PlayerInput>(player_entity_id);
-            if(player_input.state == PlayerState::ALIVE)
+
+            if(goal_found)
+            {
+                player_input.state = PlayerState::GONE;
+            }
+            else if(player_input.state == PlayerState::ALIVE)
             {
                 Texture& texture = m_component_manager->GetComponent<Texture>(player_entity_id);
                 RigidBody& rigid_body = m_component_manager->GetComponent<RigidBody>(player_entity_id);

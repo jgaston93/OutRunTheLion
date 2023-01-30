@@ -86,7 +86,7 @@ int main(int argv, char* args[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
  
-    window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Out Run The Lion", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -495,7 +495,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     // Goal Object
     transform.position[0] = 0;
     transform.position[1] = 4;
-    transform.position[2] = -10;
+    transform.position[2] = -1000;
     transform.rotation[0] = 0;
     transform.rotation[1] = 0;
     transform.rotation[2] = 0;

@@ -6,6 +6,7 @@ enum PlayerState
     ALIVE,
     DYING,
     DEAD,
+    GONE,
 };
 
 struct PlayerInput

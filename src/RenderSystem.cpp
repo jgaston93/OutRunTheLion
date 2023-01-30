@@ -31,15 +31,18 @@ void RenderSystem::Update(GLFWwindow* window, GLint mv_location)
 
     uint32_t num_entities = m_entity_manager->GetNumEntities();
 
-    // TODO: fix this hacky update of camera
     uint32_t player_id = m_entity_manager->GetEntityId("player");
+    PlayerInput& player_input = m_component_manager->GetComponent<PlayerInput>(player_id);
     Transform& player_transform = m_component_manager->GetComponent<Transform>(player_id);
-    eye[0] = player_transform.position[0];
-    eye[1] = player_transform.position[1] + 1;
-    eye[2] = player_transform.position[2] + 3;
-    look[0] = player_transform.position[0];
-    look[1] = player_transform.position[1] + 1;
-    look[2] = player_transform.position[2] - 3;
+    if(player_input.state != PlayerState::GONE)
+    {
+        eye[0] = player_transform.position[0];
+        eye[1] = player_transform.position[1] + 1;
+        eye[2] = player_transform.position[2] + 3;
+        look[0] = player_transform.position[0];
+        look[1] = player_transform.position[1] + 1;
+        look[2] = player_transform.position[2] - 3;
+    }
 
     for(int i = 0; i < num_entities; i++)
     {
