@@ -1,6 +1,13 @@
 #ifndef PLAYER_INPUT_HPP
 #define PLAYER_INPUT_HPP
 
+enum PlayerState
+{
+    ALIVE,
+    DYING,
+    DEAD,
+};
+
 struct PlayerInput
 {
     uint32_t steer_right;
@@ -11,6 +18,8 @@ struct PlayerInput
 
     float rotation;
     float acceleration;
+
+    PlayerState state;
 };
 
 #endif // PLAYER_INPUT_HPP

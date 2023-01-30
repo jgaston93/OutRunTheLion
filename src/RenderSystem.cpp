@@ -2,7 +2,7 @@
 
 #include "RenderSystem.hpp"
 
-RenderSystem::RenderSystem()
+RenderSystem::RenderSystem(MessageBus& message_bus) : System(message_bus)
 {
 
 }
@@ -12,7 +12,12 @@ RenderSystem::~RenderSystem()
 
 }
 
-void RenderSystem::Update(GLFWwindow* window, GLint mv_location, EntityManger& entity_manager, ComponentManager& component_manager)
+void RenderSystem::handleMessage(Message message)
+{
+
+}
+
+void RenderSystem::Update(GLFWwindow* window, GLint mv_location)
 {
     float ratio;
     int width, height;
@@ -21,12 +26,14 @@ void RenderSystem::Update(GLFWwindow* window, GLint mv_location, EntityManger& e
     ratio = width / (float) height;
 
     glViewport(0, 0, width, height);
+    glClearColor(0.5294, 0.8078, 0.9216, 1.0);
     glClear(GL_COLOR_BUFFER_BIT); 
 
-    uint32_t num_entities = entity_manager.GetNumEntities();
+    uint32_t num_entities = m_entity_manager->GetNumEntities();
 
     // TODO: fix this hacky update of camera
-    Transform& player_transform = component_manager.GetComponent<Transform>(num_entities - 1);
+    uint32_t player_id = m_entity_manager->GetEntityId("player");
+    Transform& player_transform = m_component_manager->GetComponent<Transform>(player_id);
     eye[0] = player_transform.position[0];
     eye[1] = player_transform.position[1] + 1;
     eye[2] = player_transform.position[2] + 3;
@@ -36,19 +43,21 @@ void RenderSystem::Update(GLFWwindow* window, GLint mv_location, EntityManger& e
 
     for(int i = 0; i < num_entities; i++)
     {
-        if(entity_manager.GetEntityState(i) == EntityState::ACTIVE && 
-            ((entity_manager.GetEntitySignature(i) & RENDER_SYSTEM_SIGNATURE) == RENDER_SYSTEM_SIGNATURE))
+        if(m_entity_manager->GetEntityState(i) == EntityState::ACTIVE && 
+            ((m_entity_manager->GetEntitySignature(i) & RENDER_SYSTEM_SIGNATURE) == RENDER_SYSTEM_SIGNATURE))
         {
-            Transform& transform = component_manager.GetComponent<Transform>(i);
-            Texture& texture = component_manager.GetComponent<Texture>(i);
+            Transform& transform = m_component_manager->GetComponent<Transform>(i);
+            Texture& texture = m_component_manager->GetComponent<Texture>(i);
+            QuadMesh& quad_mesh = m_component_manager->GetComponent<QuadMesh>(i);
 
-            float half_width = texture.width / 2;
-            float half_height = texture.height / 2;
+            float half_width = quad_mesh.extent[0] / 2;
+            float half_height = quad_mesh.extent[1] / 2;
+
             VertexData vertices[4];
-            vertices[0] = { -half_width,  half_height, 0, 0,         texture.t };
-            vertices[1] = { -half_width, -half_height, 0, 0,         0         };
-            vertices[2] = {  half_width,  half_height, 0, texture.s, texture.t };
-            vertices[3] = {  half_width, -half_height, 0, texture.s, 0         };
+            vertices[0] = { -half_width,  half_height, 0, texture.position[0] / texture.size[0],                       (texture.position[1] + texture.extent[1]) / texture.size[1] };
+            vertices[1] = { -half_width, -half_height, 0, texture.position[0] / texture.size[0],                       texture.position[1] / texture.size[1]             };
+            vertices[2] = {  half_width,  half_height, 0, (texture.position[0] + texture.extent[0]) / texture.size[0], (texture.position[1] + texture.extent[1]) / texture.size[1] };
+            vertices[3] = {  half_width, -half_height, 0, (texture.position[0] + texture.extent[0]) / texture.size[0],  texture.position[1] / texture.size[1]             };
 
             // Rotation
             mat4x4 rotation_matrix;

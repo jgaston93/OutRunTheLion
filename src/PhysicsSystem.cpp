@@ -3,7 +3,7 @@
 #include "PhysicsSystem.hpp"
 
 
-PhysicsSystem::PhysicsSystem()
+PhysicsSystem::PhysicsSystem(MessageBus& message_bus) : System(message_bus)
 {
 
 }
@@ -13,31 +13,27 @@ PhysicsSystem::~PhysicsSystem()
 
 }
 
-void PhysicsSystem::Update(float delta_time, EntityManger& entity_manager, ComponentManager& component_manager)
+void PhysicsSystem::handleMessage(Message message)
 {
     
-    uint32_t num_entities = entity_manager.GetNumEntities();
+}
+
+void PhysicsSystem::Update(float delta_time)
+{
+    
+    uint32_t num_entities = m_entity_manager->GetNumEntities();
 
     for(uint32_t i = 0; i < num_entities; i++)
     {
-        if(entity_manager.GetEntityState(i) == EntityState::ACTIVE && 
-            ((entity_manager.GetEntitySignature(i) & PHYSICS_SYSTEM_SIGNATURE) == PHYSICS_SYSTEM_SIGNATURE))
+        if(m_entity_manager->GetEntityState(i) == EntityState::ACTIVE && 
+            ((m_entity_manager->GetEntitySignature(i) & PHYSICS_SYSTEM_SIGNATURE) == PHYSICS_SYSTEM_SIGNATURE))
         {
-            Transform& transform = component_manager.GetComponent<Transform>(i);
-            RigidBody& rigid_body = component_manager.GetComponent<RigidBody>(i);
+            Transform& transform = m_component_manager->GetComponent<Transform>(i);
+            RigidBody& rigid_body = m_component_manager->GetComponent<RigidBody>(i);
 
-            rigid_body.velocity[0] += rigid_body.acceleration[0] * delta_time * 0.9;
-            rigid_body.velocity[1] += rigid_body.acceleration[1] * delta_time * 0.9;
-            rigid_body.velocity[2] += rigid_body.acceleration[2] * delta_time * 0.9;
-            
-            if(rigid_body.velocity[2] > 0)
-            {
-                rigid_body.velocity[2] = 0;
-            }
-            else if(rigid_body.velocity[2] < -22)
-            {
-                rigid_body.velocity[2] = -22;
-            }
+            rigid_body.velocity[0] += rigid_body.acceleration[0] * delta_time;
+            rigid_body.velocity[1] += rigid_body.acceleration[1] * delta_time;
+            rigid_body.velocity[2] += rigid_body.acceleration[2] * delta_time;
 
             mat4x4 rotation_matrix;
             mat4x4_identity(rotation_matrix);

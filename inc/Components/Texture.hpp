@@ -4,10 +4,9 @@
 struct Texture
 {
     uint32_t texture_id;
-    float width;
-    float height;
-    float s;
-    float t;
+    vec2 size;
+    vec2 position;
+    vec2 extent;
 };
 
 #endif // TEXTURE_HPP

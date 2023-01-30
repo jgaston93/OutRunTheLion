@@ -5,7 +5,9 @@ ComponentManager::ComponentManager(uint32_t num_entities) : m_transform_pool(num
                                                             m_rigid_body_pool(num_entities),
                                                             m_texture_pool(num_entities),
                                                             m_player_input_pool(num_entities),
-                                                            m_bounding_box_pool(num_entities)
+                                                            m_bounding_box_pool(num_entities),
+                                                            m_quad_mesh_pool(num_entities),
+                                                            m_animation_pool(num_entities)
 {
 
 }
@@ -73,4 +75,28 @@ template <>
 BoundingBox& ComponentManager::GetComponent<BoundingBox>(uint32_t entity_id)
 {
     return m_bounding_box_pool.GetComponent(entity_id);
+}
+
+template <>
+void ComponentManager::AddComponent<QuadMesh>(uint32_t entity_id, QuadMesh component)
+{
+    m_quad_mesh_pool.AddComponent(entity_id, component);
+}
+
+template <>
+QuadMesh& ComponentManager::GetComponent<QuadMesh>(uint32_t entity_id)
+{
+    return m_quad_mesh_pool.GetComponent(entity_id);
+}
+
+template <>
+void ComponentManager::AddComponent<Animation>(uint32_t entity_id, Animation component)
+{
+    m_animation_pool.AddComponent(entity_id, component);
+}
+
+template <>
+Animation& ComponentManager::GetComponent<Animation>(uint32_t entity_id)
+{
+    return m_animation_pool.GetComponent(entity_id);
 }

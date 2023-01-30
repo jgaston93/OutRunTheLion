@@ -5,7 +5,7 @@
 
 struct BoundingBox
 {
-    vec3 bouding_box;
+    vec3 extent;
 };
 
 #endif // BOUDING_BOX_HPP

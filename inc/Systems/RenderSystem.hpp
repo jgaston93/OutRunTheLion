@@ -5,12 +5,10 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "System.hpp"
 #include "InputMap.hpp"
-#include "EntityManger.hpp"
-#include "ComponentManager.hpp"
 #include "linmath.h"
-
-const uint32_t RENDER_SYSTEM_SIGNATURE = 0x00000005;
+#include "Signatures.hpp"
 
 struct VertexData
 {
@@ -21,13 +19,14 @@ struct VertexData
     float t;
 };
 
-class RenderSystem
+class RenderSystem : public System
 {
     public:
-    RenderSystem();
+    RenderSystem(MessageBus& message_bus);
     ~RenderSystem();
 
-    void Update(GLFWwindow* window, GLint mv_location, EntityManger& entity_manager, ComponentManager& component_manager);
+    void Update(GLFWwindow* window, GLint mv_location);
+    void handleMessage(Message message);
 
     private:
     

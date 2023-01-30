@@ -6,18 +6,21 @@
 #include <chrono>
 #include <thread>
 #include <vector>
+#include <cstdlib>
 
 #include "linmath.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #include "ComponentManager.hpp"
-#include "EntityManger.hpp"
+#include "EntityManager.hpp"
 
 #include "PlayerInputSystem.hpp"
 #include "PhysicsSystem.hpp"
 #include "RenderSystem.hpp"
- 
+#include "AnimationSystem.hpp"
+#include "CollisionSystem.hpp"
+
 static const char* vertex_shader_text =
 "#version 130\n"
 "uniform mat4 MV;\n"
@@ -66,8 +69,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     input_map->SetIsPressed(key, is_pressed);
 }
 
-void GenerateEntities(EntityManger& entity_manager, ComponentManager& component_manager);
-GLuint grass_texture, road_texture, antelope_texture;
+void GenerateEntities(EntityManager& entity_manager, ComponentManager& component_manager);
+GLuint grass_texture, road_texture, antelope_texture, big_sheet_texture;
 
 int main(int argv, char* args[])
 { 
@@ -95,8 +98,7 @@ int main(int argv, char* args[])
     glfwMakeContextCurrent(window);
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1);
- 
-    // NOTE: OpenGL error checks have been omitted for brevity
+    
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glGenBuffers(1, &vertex_buffer);
@@ -139,6 +141,20 @@ int main(int argv, char* args[])
     
     stbi_set_flip_vertically_on_load(true);
     data = stbi_load("../assets/antelope_texture.png", &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    glGenTextures(1, &big_sheet_texture);
+    glBindTexture(GL_TEXTURE_2D, big_sheet_texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    
+    stbi_set_flip_vertically_on_load(true);
+    data = stbi_load("../assets/big_sheet_texture.png", &width, &height, &nrChannels, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
@@ -220,15 +236,29 @@ int main(int argv, char* args[])
     {
         input_map->AddInput(input_list[i]);
     }
-
-    PlayerInputSystem player_input_system(*input_map);
-    PhysicsSystem physics_system;
-    RenderSystem render_system;
     
-    const uint32_t num_entities = 3;
-    EntityManger entity_manager(num_entities);
+    const uint32_t num_entities = 54;
+    EntityManager entity_manager(num_entities);
     ComponentManager component_manager(num_entities);
     GenerateEntities(entity_manager, component_manager);
+
+    MessageBus message_bus(64, 64);
+
+    PlayerInputSystem player_input_system(message_bus, *input_map);
+    player_input_system.SetEntityManager(&entity_manager);
+    player_input_system.SetComponentManager(&component_manager);
+    PhysicsSystem physics_system(message_bus);
+    physics_system.SetEntityManager(&entity_manager);
+    physics_system.SetComponentManager(&component_manager);
+    RenderSystem render_system(message_bus);
+    render_system.SetEntityManager(&entity_manager);
+    render_system.SetComponentManager(&component_manager);
+    AnimationSystem animation_system(message_bus);
+    animation_system.SetEntityManager(&entity_manager);
+    animation_system.SetComponentManager(&component_manager);
+    CollisionSystem collision_system(message_bus);
+    collision_system.SetEntityManager(&entity_manager);
+    collision_system.SetComponentManager(&component_manager);
     
     std::chrono::time_point<std::chrono::steady_clock> prev_time = std::chrono::steady_clock::now();
     uint32_t num_frames = 0;
@@ -244,9 +274,12 @@ int main(int argv, char* args[])
 
         glfwPollEvents();
 
-        player_input_system.Update(entity_manager, component_manager);
-        physics_system.Update(delta_time, entity_manager, component_manager);
-        render_system.Update(window, mv_location, entity_manager, component_manager);
+        message_bus.update();
+        player_input_system.Update(delta_time);
+        physics_system.Update(delta_time);
+        animation_system.Update(delta_time);
+        render_system.Update(window, mv_location);
+        collision_system.Update();
         
         // Calculate time to sleep and sleep if necessary
         std::chrono::time_point<std::chrono::steady_clock> next_frame_time = current_time + std::chrono::milliseconds(MS_PER_FRAME);
@@ -262,64 +295,139 @@ int main(int argv, char* args[])
 }
 
 
-void GenerateEntities(EntityManger& entity_manager, ComponentManager& component_manager)
+void GenerateEntities(EntityManager& entity_manager, ComponentManager& component_manager)
 {
     uint32_t entity_number = 0;
 
     Transform transform;
     Texture texture;
+    QuadMesh quad_mesh;
 
     // Ground Object
     transform.position[0] = 0;
     transform.position[1] = 0;
-    transform.position[2] = -20;
+    transform.position[2] = 0;
     transform.rotation[0] = 90;
     transform.rotation[1] = 0;
     transform.rotation[2] = 0;
     transform.scale[0] = 0;
     transform.scale[1] = 0;
     transform.scale[2] = 0;
+
+    quad_mesh.extent[0] = 500;
+    quad_mesh.extent[1] = 10000;
     
     texture.texture_id = grass_texture;
-    texture.width = 500;
-    texture.height = 1000;
-    texture.s = 500;
-    texture.t = 1000;
+    texture.size[0] = 2;
+    texture.size[1] = 2;
+    texture.position[0] = 0;
+    texture.position[1] = 0;
+    texture.extent[0] = 500;
+    texture.extent[1] = 10000;
 
     entity_manager.SetEntitySignature(entity_number, RENDER_SYSTEM_SIGNATURE);
     entity_manager.SetEntityState(entity_number, EntityState::ACTIVE);
 
     component_manager.AddComponent<Transform>(entity_number, transform);
+    component_manager.AddComponent<QuadMesh>(entity_number, quad_mesh);
     component_manager.AddComponent<Texture>(entity_number, texture);
 
     // Road Object
     transform.position[0] = 0;
     transform.position[1] = 0;
-    transform.position[2] = -20;
+    transform.position[2] = 0;
     transform.rotation[0] = 90;
     transform.rotation[1] = 0;
     transform.rotation[2] = 0;
     transform.scale[0] = 0;
     transform.scale[1] = 0;
     transform.scale[2] = 0;
+
+    quad_mesh.extent[0] = 5;
+    quad_mesh.extent[1] = 10000;
     
     texture.texture_id = road_texture;
-    texture.width = 10;
-    texture.height = 1000;
-    texture.s = 10;
-    texture.t = 1000;
+    texture.size[0] = 2;
+    texture.size[1] = 2;
+    texture.position[0] = 0;
+    texture.position[1] = 0;
+    texture.extent[0] = 5;
+    texture.extent[1] = 10000;
 
     entity_number++;
     entity_manager.SetEntitySignature(entity_number, RENDER_SYSTEM_SIGNATURE);
     entity_manager.SetEntityState(entity_number, EntityState::ACTIVE);
 
     component_manager.AddComponent<Transform>(entity_number, transform);
+    component_manager.AddComponent<QuadMesh>(entity_number, quad_mesh);
     component_manager.AddComponent<Texture>(entity_number, texture);
+
+    // AI Objects
+
+    for(uint32_t i = 0; i < 50; i++)
+    {
+        transform.position[0] = (rand() % 5) - 2.5;
+        transform.position[1] = 0;
+        transform.position[2] = -(rand() % 1000);
+        transform.rotation[0] = 0;
+        transform.rotation[1] = 0;
+        transform.rotation[2] = 0;
+        transform.scale[0] = 0;
+        transform.scale[1] = 0;
+        transform.scale[2] = 0;
+
+        RigidBody rigid_body;
+        rigid_body.acceleration[0] = 0;
+        rigid_body.acceleration[1] = 0;
+        rigid_body.acceleration[2] = 0;
+        rigid_body.velocity[0] = 0;
+        rigid_body.velocity[1] = 0;
+        rigid_body.velocity[2] = -((rand() % 10) + 5);
+
+        quad_mesh.extent[0] = 0.5;
+        quad_mesh.extent[1] = 1;
+
+        texture.texture_id = antelope_texture;
+        texture.size[0] = 100;
+        texture.size[1] = 250;
+        texture.position[0] = 0;
+        texture.position[1] = 150;
+        texture.extent[0] = 50;
+        texture.extent[1] = 100;
+
+        Animation animation;
+        animation.paused = false;
+        animation.current_frame = 0;
+        animation.num_frames = 2;
+        animation.counter = 0;
+        animation.speed = 1 / -(rigid_body.velocity[2]);
+
+        BoundingBox bounding_box;
+        bounding_box.extent[0] = 0.5;
+        bounding_box.extent[1] = 1;
+        bounding_box.extent[2] = 0.5;
+
+        entity_number++;
+        entity_manager.SetEntitySignature(entity_number, RENDER_SYSTEM_SIGNATURE | 
+                                                         PHYSICS_SYSTEM_SIGNATURE | 
+                                                         ANIMATION_SYSTEM_SIGNATURE |
+                                                         AI_SYSTEM_SIGNATURE |
+                                                         COLLISION_SYSTEM_SIGNATURE);
+        entity_manager.SetEntityState(entity_number, EntityState::ACTIVE);
+
+        component_manager.AddComponent<Transform>(entity_number, transform);
+        component_manager.AddComponent<RigidBody>(entity_number, rigid_body);
+        component_manager.AddComponent<Texture>(entity_number, texture);
+        component_manager.AddComponent<QuadMesh>(entity_number, quad_mesh);
+        component_manager.AddComponent<Animation>(entity_number, animation);
+        component_manager.AddComponent<BoundingBox>(entity_number, bounding_box);
+    }
+
     
     // Player Object
     transform.position[0] = 0;
     transform.position[1] = 0;
-    transform.position[2] = -10;
+    transform.position[2] = 0;
     transform.rotation[0] = 0;
     transform.rotation[1] = 0;
     transform.rotation[2] = 0;
@@ -342,21 +450,82 @@ void GenerateEntities(EntityManger& entity_manager, ComponentManager& component_
     player_input.brake = GLFW_KEY_DOWN;
     player_input.rotation = -10;
     player_input.acceleration = -1.38;
+    player_input.state = PlayerState::ALIVE;
+
+    quad_mesh.extent[0] = 0.5;
+    quad_mesh.extent[1] = 1;
 
     texture.texture_id = antelope_texture;
-    texture.width = 0.26;
-    texture.height = 1;
-    texture.s = 1;
-    texture.t = 1;
+    texture.size[0] = 100;
+    texture.size[1] = 250;
+    texture.position[0] = 0;
+    texture.position[1] = 150;
+    texture.extent[0] = 50;
+    texture.extent[1] = 100;
+
+    Animation animation;
+    animation.paused = false;
+    animation.current_frame = 0;
+    animation.num_frames = 2;
+    animation.counter = 0;
+    animation.speed = 1 / -(rigid_body.velocity[2]);
+
+    BoundingBox bounding_box;
+    bounding_box.extent[0] = 0.5;
+    bounding_box.extent[1] = 1;
+    bounding_box.extent[2] = 0.5;
 
     entity_number++;
-    entity_manager.SetEntitySignature(entity_number, PLAYER_INPUT_SYSTEM_SIGNATURE | RENDER_SYSTEM_SIGNATURE | PHYSICS_SYSTEM_SIGNATURE);
+    entity_manager.SetEntitySignature(entity_number, PLAYER_INPUT_SYSTEM_SIGNATURE | 
+                                                     RENDER_SYSTEM_SIGNATURE | 
+                                                     PHYSICS_SYSTEM_SIGNATURE | 
+                                                     ANIMATION_SYSTEM_SIGNATURE |
+                                                     COLLISION_SYSTEM_SIGNATURE);
     entity_manager.SetEntityState(entity_number, EntityState::ACTIVE);
+    entity_manager.SetEntityTag(entity_number, "player");
 
     component_manager.AddComponent<Transform>(entity_number, transform);
     component_manager.AddComponent<RigidBody>(entity_number, rigid_body);
     component_manager.AddComponent<PlayerInput>(entity_number, player_input);
     component_manager.AddComponent<Texture>(entity_number, texture);
+    component_manager.AddComponent<QuadMesh>(entity_number, quad_mesh);
+    component_manager.AddComponent<Animation>(entity_number, animation);
+    component_manager.AddComponent<BoundingBox>(entity_number, bounding_box);
 
+    // Goal Object
+    transform.position[0] = 0;
+    transform.position[1] = 4;
+    transform.position[2] = -10;
+    transform.rotation[0] = 0;
+    transform.rotation[1] = 0;
+    transform.rotation[2] = 0;
+    transform.scale[0] = 0;
+    transform.scale[1] = 0;
+    transform.scale[2] = 0;
 
+    quad_mesh.extent[0] = 5;
+    quad_mesh.extent[1] = 8;
+    
+    texture.texture_id = big_sheet_texture;
+    texture.size[0] = 200;
+    texture.size[1] = 300;
+    texture.position[0] = 0;
+    texture.position[1] = 0;
+    texture.extent[0] = 200;
+    texture.extent[1] = 300;
+    
+    bounding_box.extent[0] = 5;
+    bounding_box.extent[1] = 8;
+    bounding_box.extent[2] = 1;
+
+    entity_number++;
+    entity_manager.SetEntitySignature(entity_number, RENDER_SYSTEM_SIGNATURE |
+                                                         COLLISION_SYSTEM_SIGNATURE);
+    entity_manager.SetEntityState(entity_number, EntityState::ACTIVE);
+    entity_manager.SetEntityTag(entity_number, "goal");
+
+    component_manager.AddComponent<Transform>(entity_number, transform);
+    component_manager.AddComponent<QuadMesh>(entity_number, quad_mesh);
+    component_manager.AddComponent<Texture>(entity_number, texture);
+    component_manager.AddComponent<BoundingBox>(entity_number, bounding_box);
 }

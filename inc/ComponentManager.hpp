@@ -7,6 +7,8 @@
 #include "RigidBody.hpp"
 #include "PlayerInput.hpp"
 #include "BoundingBox.hpp"
+#include "QuadMesh.hpp"
+#include "Animation.hpp"
 
 class ComponentManager
 {
@@ -26,6 +28,8 @@ class ComponentManager
     ComponentPool<RigidBody> m_rigid_body_pool;
     ComponentPool<PlayerInput> m_player_input_pool;
     ComponentPool<BoundingBox> m_bounding_box_pool;
+    ComponentPool<QuadMesh> m_quad_mesh_pool;
+    ComponentPool<Animation> m_animation_pool;
 };
 
 #endif // COMPONENT_MANAGER_HPP
