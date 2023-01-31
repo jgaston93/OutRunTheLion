@@ -130,42 +130,52 @@ void RenderSystem::Update(GLFWwindow* window, GLint mv_location)
             Transform& transform = m_component_manager->GetComponent<Transform>(i);
             LabelTexture& label_texture = m_component_manager->GetComponent<LabelTexture>(i);
 
+            float x_position = 0;
+
             uint32_t label_length = strlen(label_texture.characters);
             for(uint32_t i = 0; i < label_length; i++)
             {
+                
                 VertexData vertices[4];
-                vertices[0] = { 0,  0, 0, texture.position[0] / texture.size[0],                       (texture.position[1] + texture.extent[1]) / texture.size[1] };
-                vertices[1] = { 0, -1, 0, texture.position[0] / texture.size[0],                       texture.position[1] / texture.size[1]             };
-                vertices[2] = { 1,  0, 0, (texture.position[0] + texture.extent[0]) / texture.size[0], (texture.position[1] + texture.extent[1]) / texture.size[1] };
-                vertices[3] = { 1, -1, 0, (texture.position[0] + texture.extent[0]) / texture.size[0],  texture.position[1] / texture.size[1]             };
+                char character = label_texture.characters[i];
+                uint32_t character_index = 0;
+                vec2 texture_start_index = { 0, 0 };
+                
+                if('A' <= character && character <= 'Z')
+                {
+                    character_index = character - 'A';
+                    texture_start_index[0] = alpha_start_index_position[0] + character_index * stride;
+                    texture_start_index[1] = alpha_start_index_position[1];
+                }
+                else if('0' <= character && character <= '9')
+                {
+                    character_index = character - '0';
+                    texture_start_index[0] = numeric_start_index_position[0] + character_index * stride;
+                    texture_start_index[1] = numeric_start_index_position[1];
+                }
 
-                // Rotation
-                mat4x4 rotation_matrix;
-                mat4x4_identity(rotation_matrix);
-                mat4x4_rotate_Z(rotation_matrix, rotation_matrix, transform.rotation[2] * M_PI / 180.0);
-                mat4x4_rotate_Y(rotation_matrix, rotation_matrix, transform.rotation[1] * M_PI / 180.0);
-                mat4x4_rotate_X(rotation_matrix, rotation_matrix, transform.rotation[0] * M_PI / 180.0);
+                vertices[0] = { transform.position[0] + x_position,  transform.position[1] + character_extent[1], -10, 
+                                texture_start_index[0] / label_texture.texture_size[0], (texture_start_index[1] + character_extent[1]) / label_texture.texture_size[1] };
+                                
+                vertices[1] = { transform.position[0] + x_position, transform.position[1], -10, 
+                                texture_start_index[0] / label_texture.texture_size[0], texture_start_index[1] / label_texture.texture_size[1] };
 
-                // Translation
-                mat4x4 translation_matrix;
-                mat4x4_identity(translation_matrix);
-                mat4x4_identity(translation_matrix);
-                mat4x4_translate(translation_matrix, transform.position[0], transform.position[1], transform.position[2]);
-
-                mat4x4 model_matrix;
-                mat4x4_mul(model_matrix, translation_matrix, rotation_matrix);
-                            
-                mat4x4 view_matrix;
-                mat4x4_look_at(view_matrix, eye, look, up);
+                vertices[2] = { transform.position[0] + character_extent[0] + x_position, transform.position[1] + character_extent[1], -10, 
+                                (texture_start_index[0] + character_extent[0]) / label_texture.texture_size[0], (texture_start_index[1] + character_extent[1]) / label_texture.texture_size[1] };
+                                
+                vertices[3] = { transform.position[0] + character_extent[0] + x_position, transform.position[1], -10, 
+                                (texture_start_index[0] + character_extent[0]) / label_texture.texture_size[0],  texture_start_index[1] / label_texture.texture_size[1] };
 
                 mat4x4 model_view_matrix;
-                mat4x4_mul(model_view_matrix, view_matrix, model_matrix);
+                mat4x4_identity(model_view_matrix);
+                // mat4x4_scale_aniso(model_view_matrix, model_view_matrix, 0.05, 0.05, 1);
 
                 glUniformMatrix4fv(mv_location, 1, GL_FALSE, (const GLfloat*) model_view_matrix);
-                glBindTexture(GL_TEXTURE_2D, texture.texture_id);
+                glBindTexture(GL_TEXTURE_2D, label_texture.texture_id);
 
                 glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_DYNAMIC_DRAW);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                x_position += stride;
             }
         }
     }

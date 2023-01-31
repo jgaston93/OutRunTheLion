@@ -6,7 +6,7 @@
 struct LabelTexture
 {
     uint32_t texture_id;
-    uint32_t max_num_characters;
+    vec2 texture_size;
     char* characters;
 };
 

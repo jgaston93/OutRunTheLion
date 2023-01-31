@@ -7,7 +7,8 @@ ComponentManager::ComponentManager(uint32_t num_entities) : m_transform_pool(num
                                                             m_player_input_pool(num_entities),
                                                             m_bounding_box_pool(num_entities),
                                                             m_quad_mesh_pool(num_entities),
-                                                            m_animation_pool(num_entities)
+                                                            m_animation_pool(num_entities),
+                                                            m_label_texture_pool(num_entities)
 {
 
 }

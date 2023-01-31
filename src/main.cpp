@@ -237,7 +237,7 @@ int main(int argv, char* args[])
         input_map->AddInput(input_list[i]);
     }
     
-    const uint32_t num_entities = 54;
+    const uint32_t num_entities = 55;
     EntityManager entity_manager(num_entities);
     ComponentManager component_manager(num_entities);
     GenerateEntities(entity_manager, component_manager);
@@ -515,7 +515,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     texture.size[1] = 300;
     texture.position[0] = 0;
     texture.position[1] = 0;
-    texture.extent[0] = 200;
+    texture.extent[0] = 800;
     texture.extent[1] = 300;
     
     bounding_box.extent[0] = 5;
@@ -532,4 +532,29 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     component_manager.AddComponent<QuadMesh>(entity_number, quad_mesh);
     component_manager.AddComponent<Texture>(entity_number, texture);
     component_manager.AddComponent<BoundingBox>(entity_number, bounding_box);
+
+    // Score Object    
+    transform.position[0] = -10;
+    transform.position[1] = 0;
+    transform.position[2] = 0;
+    transform.rotation[0] = 0;
+    transform.rotation[1] = 0;
+    transform.rotation[2] = 0;
+    transform.scale[0] = 0;
+    transform.scale[1] = 0;
+    transform.scale[2] = 0;
+
+    LabelTexture label_texture;
+    label_texture.texture_id = big_sheet_texture;
+    label_texture.texture_size[0] = 800;
+    label_texture.texture_size[1] = 200;
+    label_texture.characters = new char[64];
+    snprintf(label_texture.characters, 64, "SCORE");
+
+    entity_number++;
+    entity_manager.SetEntitySignature(entity_number, HUD_RENDER_SYSTEM_SIGNATURE);
+    entity_manager.SetEntityState(entity_number, EntityState::ACTIVE);
+
+    component_manager.AddComponent<Transform>(entity_number, transform);
+    component_manager.AddComponent<LabelTexture>(entity_number, label_texture);
 }
