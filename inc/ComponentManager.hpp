@@ -9,6 +9,7 @@
 #include "BoundingBox.hpp"
 #include "QuadMesh.hpp"
 #include "Animation.hpp"
+#include "LabelTexture.hpp"
 
 class ComponentManager
 {
@@ -30,6 +31,7 @@ class ComponentManager
     ComponentPool<BoundingBox> m_bounding_box_pool;
     ComponentPool<QuadMesh> m_quad_mesh_pool;
     ComponentPool<Animation> m_animation_pool;
+    ComponentPool<LabelTexture> m_label_texture_pool;
 };
 
 #endif // COMPONENT_MANAGER_HPP

@@ -48,9 +48,7 @@ void CollisionSystem::Update()
                     {
                         Message message;
                         message.message_type = MessageType::COLLISION;
-                        message.message_data = 0;
-                        message.message_data += i << 16;
-                        message.message_data += j; 
+                        message.message_data = (i << 16) + j;
                         m_message_bus.postMessage(message);
 
                     }

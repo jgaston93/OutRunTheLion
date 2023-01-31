@@ -100,3 +100,15 @@ Animation& ComponentManager::GetComponent<Animation>(uint32_t entity_id)
 {
     return m_animation_pool.GetComponent(entity_id);
 }
+
+template <>
+void ComponentManager::AddComponent<LabelTexture>(uint32_t entity_id, LabelTexture component)
+{
+    m_label_texture_pool.AddComponent(entity_id, component);
+}
+
+template <>
+LabelTexture& ComponentManager::GetComponent<LabelTexture>(uint32_t entity_id)
+{
+    return m_label_texture_pool.GetComponent(entity_id);
+}

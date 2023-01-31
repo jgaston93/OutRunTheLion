@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-enum MessageType : uint16_t
+enum MessageType
 {
     QUIT,
     KEYPRESS,
@@ -14,7 +14,7 @@ enum MessageType : uint16_t
 struct Message
 {
     MessageType message_type;
-    uint16_t message_data;
+    uint32_t message_data;
 };
 
 #endif // MESSAGE_HPP

@@ -469,6 +469,10 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     animation.num_frames = 2;
     animation.counter = 0;
     animation.speed = 1 / -(rigid_body.velocity[2]);
+    if(animation.speed < 0.1)
+    {
+        animation.speed = 0.1;
+    }
 
     BoundingBox bounding_box;
     bounding_box.extent[0] = 0.5;

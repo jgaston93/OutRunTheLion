@@ -17,18 +17,12 @@ void PlayerInputSystem::handleMessage(Message message)
         uint32_t entity_1_id = message.message_data >> 16;
         uint32_t entity_2_id = message.message_data & 0x0000FFFF;
         uint32_t player_entity_id = 0;
-        uint32_t goal_entity_id = 0;
         bool player_found = false;
         bool goal_found = false;
 
-        if(strcmp("goal", m_entity_manager->GetEntityTag(entity_1_id)))
+        if(strcmp("goal", m_entity_manager->GetEntityTag(entity_1_id)) == 0 ||
+            strcmp("goal", m_entity_manager->GetEntityTag(entity_2_id)) == 0)
         {
-            goal_entity_id = entity_1_id;
-            goal_found = true;
-        }
-        else if(strcmp("goal", m_entity_manager->GetEntityTag(entity_2_id)))
-        {
-            goal_entity_id = entity_2_id;
             goal_found = true;
         }
 
@@ -140,7 +134,11 @@ void PlayerInputSystem::Update(float delta_time)
             if(rigid_body.velocity[2] < 0)
             {
                 animation.speed = 1 / -rigid_body.velocity[2];
-            animation.paused = false;
+                if(animation.speed < 0.1)
+                {
+                    animation.speed = 0.1;
+                }
+                animation.paused = false;
             }
         }
     }
