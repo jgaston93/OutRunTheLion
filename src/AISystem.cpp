@@ -25,7 +25,21 @@ void AISystem::Update(float delta_time)
         if(m_entity_manager->GetEntityState(i) == EntityState::ACTIVE && 
             ((m_entity_manager->GetEntitySignature(i) & AI_SYSTEM_SIGNATURE) == AI_SYSTEM_SIGNATURE))
         {
+            Transform& transform = m_component_manager->GetComponent<Transform>(i);
 
+            if((rand() % 100) < 20)
+            {
+                transform.rotation[1] = (rand() % 60) - 30;
+            }
+
+            if(transform.position[0] < -2.5)
+            {
+                transform.rotation[1] = -(rand() % 10);
+            }
+            else if(transform.position[0] > 2.5)
+            {
+                transform.rotation[1] = (rand() % 15);
+            }
         }
     }
 }

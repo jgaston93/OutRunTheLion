@@ -9,7 +9,8 @@ add_executable(OutRunTheLion main.cpp
                              PhysicsSystem.cpp
                              RenderSystem.cpp
                              CollisionSystem.cpp
-                             AnimationSystem.cpp)
+                             AnimationSystem.cpp
+                             AISystem.cpp)
 
 target_include_directories(OutRunTheLion PUBLIC ${CMAKE_SOURCE_DIR}/inc
                                                 ${CMAKE_SOURCE_DIR}/inc/Components

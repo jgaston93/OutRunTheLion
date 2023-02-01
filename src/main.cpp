@@ -20,6 +20,7 @@
 #include "RenderSystem.hpp"
 #include "AnimationSystem.hpp"
 #include "CollisionSystem.hpp"
+#include "AISystem.hpp"
 
 static const char* vertex_shader_text =
 "#version 130\n"
@@ -259,6 +260,9 @@ int main(int argv, char* args[])
     CollisionSystem collision_system(message_bus);
     collision_system.SetEntityManager(&entity_manager);
     collision_system.SetComponentManager(&component_manager);
+    AISystem ai_system(message_bus);
+    ai_system.SetEntityManager(&entity_manager);
+    ai_system.SetComponentManager(&component_manager);
     
     std::chrono::time_point<std::chrono::steady_clock> prev_time = std::chrono::steady_clock::now();
     uint32_t num_frames = 0;
@@ -280,6 +284,7 @@ int main(int argv, char* args[])
         animation_system.Update(delta_time);
         render_system.Update(window, mv_location);
         collision_system.Update();
+        ai_system.Update(delta_time);
         
         // Calculate time to sleep and sleep if necessary
         std::chrono::time_point<std::chrono::steady_clock> next_frame_time = current_time + std::chrono::milliseconds(MS_PER_FRAME);
@@ -511,12 +516,12 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     quad_mesh.extent[1] = 8;
     
     texture.texture_id = big_sheet_texture;
-    texture.size[0] = 200;
-    texture.size[1] = 300;
+    texture.size[0] = 800;
+    texture.size[1] = 200;
     texture.position[0] = 0;
     texture.position[1] = 0;
-    texture.extent[0] = 800;
-    texture.extent[1] = 300;
+    texture.extent[0] = 300;
+    texture.extent[1] = 200;
     
     bounding_box.extent[0] = 5;
     bounding_box.extent[1] = 8;
@@ -531,8 +536,8 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     component_manager.AddComponent<Transform>(entity_number, transform);
     component_manager.AddComponent<QuadMesh>(entity_number, quad_mesh);
     component_manager.AddComponent<Texture>(entity_number, texture);
-    component_manager.AddComponent<BoundingBox>(entity_number, bounding_box);
-
+    component_manager.AddComponent<BoundingBox>(entity_number, bounding_box);    
+    
     // Score Object    
     transform.position[0] = -10;
     transform.position[1] = 0;
