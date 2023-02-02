@@ -23,7 +23,7 @@ void RenderSystem::handleMessage(Message message)
 
 }
 
-void RenderSystem::Update(GLFWwindow* window, GLint mv_location)
+void RenderSystem::Update(GLFWwindow* window, GLint mvp_location)
 {
     float ratio;
     int width, height;
@@ -81,16 +81,24 @@ void RenderSystem::Update(GLFWwindow* window, GLint mv_location)
             mat4x4_identity(translation_matrix);
             mat4x4_translate(translation_matrix, transform.position[0], transform.position[1], transform.position[2]);
 
+            // Model Matrix
             mat4x4 model_matrix;
             mat4x4_mul(model_matrix, translation_matrix, rotation_matrix);
                         
+            // View Matrix
             mat4x4 view_matrix;
             mat4x4_look_at(view_matrix, eye, look, up);
+            
+            // Perspective Matrix
+            mat4x4 perspective_matrix;
+            mat4x4_perspective(perspective_matrix, 65 * M_PI / 180.0, 4 / 3, 1, 200);
 
+            // Model View Perspective Matrix
             mat4x4 model_view_matrix;
             mat4x4_mul(model_view_matrix, view_matrix, model_matrix);
+            mat4x4_mul(model_view_matrix, perspective_matrix, model_view_matrix);            
 
-            glUniformMatrix4fv(mv_location, 1, GL_FALSE, (const GLfloat*) model_view_matrix);
+            glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) model_view_matrix);
             glBindTexture(GL_TEXTURE_2D, texture.texture_id);
 
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_DYNAMIC_DRAW);
@@ -148,16 +156,24 @@ void RenderSystem::Update(GLFWwindow* window, GLint mv_location)
             mat4x4_identity(translation_matrix);
             mat4x4_translate(translation_matrix, transform.position[0], transform.position[1], transform.position[2]);
 
+            // Model Matrix
             mat4x4 model_matrix;
             mat4x4_mul(model_matrix, translation_matrix, rotation_matrix);
                         
+            // View Matrix
             mat4x4 view_matrix;
             mat4x4_look_at(view_matrix, eye, look, up);
+            
+            // Perspective Matrix
+            mat4x4 perspective_matrix;
+            mat4x4_perspective(perspective_matrix, 65 * M_PI / 180.0, 4 / 3, 1, 200);
 
+            // Model View Perspective Matrix
             mat4x4 model_view_matrix;
             mat4x4_mul(model_view_matrix, view_matrix, model_matrix);
+            mat4x4_mul(model_view_matrix, perspective_matrix, model_view_matrix);
 
-            glUniformMatrix4fv(mv_location, 1, GL_FALSE, (const GLfloat*) model_view_matrix);
+            glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) model_view_matrix);
             glBindTexture(GL_TEXTURE_2D, texture.texture_id);
 
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_DYNAMIC_DRAW);
@@ -178,7 +194,15 @@ void RenderSystem::Update(GLFWwindow* window, GLint mv_location)
             Transform& transform = m_component_manager->GetComponent<Transform>(i);
             LabelTexture& label_texture = m_component_manager->GetComponent<LabelTexture>(i);
 
-            float x_position = 0;
+            vec2 vertices_positions[4] = { { transform.position[0],                       transform.position[1] + character_extent[1] },
+                                           { transform.position[0],                       transform.position[1]                       },
+                                           { transform.position[0] + character_extent[0], transform.position[1] + character_extent[1] },
+                                           { transform.position[0] + character_extent[0], transform.position[1]                       } };
+
+            
+            int width, height;
+
+            glfwGetFramebufferSize(window, &width, &height);
 
             uint32_t label_length = strlen(label_texture.characters);
             for(uint32_t i = 0; i < label_length; i++)
@@ -201,29 +225,34 @@ void RenderSystem::Update(GLFWwindow* window, GLint mv_location)
                     texture_start_index[0] = numeric_start_index_position[0] + character_index * stride;
                     texture_start_index[1] = numeric_start_index_position[1];
                 }
+                else if(character == ' ')
+                {
+                    character_index = 26;
+                    texture_start_index[0] = alpha_start_index_position[0] + character_index * stride;
+                    texture_start_index[1] = alpha_start_index_position[1];
+                }
 
-                vertices[0] = { transform.position[0] + x_position,  transform.position[1] + character_extent[1], -10, 
+                vertices[0] = { 2.0f * (vertices_positions[0][0] + stride * i) / width - 1.0f, 2.0f * vertices_positions[0][1] / height - 1.0f, 0, 
                                 texture_start_index[0] / label_texture.texture_size[0], (texture_start_index[1] + character_extent[1]) / label_texture.texture_size[1] };
                                 
-                vertices[1] = { transform.position[0] + x_position, transform.position[1], -10, 
+                vertices[1] = { 2.0f * (vertices_positions[1][0] + stride * i) / width - 1.0f, 2.0f * vertices_positions[1][1] / height - 1.0f, 0, 
                                 texture_start_index[0] / label_texture.texture_size[0], texture_start_index[1] / label_texture.texture_size[1] };
 
-                vertices[2] = { transform.position[0] + character_extent[0] + x_position, transform.position[1] + character_extent[1], -10, 
+                vertices[2] = { 2.0f * (vertices_positions[2][0] + stride * i) / width - 1.0f, 2.0f * vertices_positions[2][1] / height - 1.0f, 0, 
                                 (texture_start_index[0] + character_extent[0]) / label_texture.texture_size[0], (texture_start_index[1] + character_extent[1]) / label_texture.texture_size[1] };
                                 
-                vertices[3] = { transform.position[0] + character_extent[0] + x_position, transform.position[1], -10, 
+                vertices[3] = { 2.0f * (vertices_positions[3][0] + stride * i) / width - 1.0f, 2.0f * vertices_positions[3][1] / height - 1.0f, 0, 
                                 (texture_start_index[0] + character_extent[0]) / label_texture.texture_size[0],  texture_start_index[1] / label_texture.texture_size[1] };
+
 
                 mat4x4 model_view_matrix;
                 mat4x4_identity(model_view_matrix);
-                // mat4x4_scale_aniso(model_view_matrix, model_view_matrix, 0.05, 0.05, 1);
 
-                glUniformMatrix4fv(mv_location, 1, GL_FALSE, (const GLfloat*) model_view_matrix);
+                glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) model_view_matrix);
                 glBindTexture(GL_TEXTURE_2D, label_texture.texture_id);
 
                 glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_DYNAMIC_DRAW);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-                x_position += stride;
             }
         }
     }

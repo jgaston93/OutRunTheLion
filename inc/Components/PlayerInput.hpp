@@ -21,6 +21,7 @@ struct PlayerInput
     float acceleration;
 
     PlayerState state;
+    uint32_t score;
 };
 
 #endif // PLAYER_INPUT_HPP

@@ -32,11 +32,11 @@ void AISystem::Update(float delta_time)
                 transform.rotation[1] = (rand() % 60) - 30;
             }
 
-            if(transform.position[0] < -2.5)
+            if(transform.position[0] < -2)
             {
                 transform.rotation[1] = -(rand() % 10);
             }
-            else if(transform.position[0] > 2.5)
+            else if(transform.position[0] > 2)
             {
                 transform.rotation[1] = (rand() % 15);
             }

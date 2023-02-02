@@ -24,14 +24,13 @@
 
 static const char* vertex_shader_text =
 "#version 130\n"
-"uniform mat4 MV;\n"
-"uniform mat4 P;\n"
+"uniform mat4 MVP;\n"
 "attribute vec3 vPos;\n"
 "attribute vec2 vTexCoord;\n"
 "varying vec2 texCoord;\n"
 "void main()\n"
 "{\n"
-"    gl_Position = P * MV * vec4(vPos, 1.0);\n"
+"    gl_Position = MVP * vec4(vPos, 1.0);\n"
 "    texCoord = vTexCoord;\n"
 "}\n";
  
@@ -77,7 +76,7 @@ int main(int argv, char* args[])
 { 
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint mv_location, p_location, vpos_location, vtex_coord_location, texture_location;
+    GLint mvp_location, vpos_location, vtex_coord_location, texture_location;
  
     glfwSetErrorCallback(error_callback);
  
@@ -207,9 +206,9 @@ int main(int argv, char* args[])
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
+    glUseProgram(program);
  
-    mv_location = glGetUniformLocation(program, "MV");
-    p_location = glGetUniformLocation(program, "P");
+    mvp_location = glGetUniformLocation(program, "MVP");
     texture_location = glGetUniformLocation(program, "sampler");
     vpos_location = glGetAttribLocation(program, "vPos");
     vtex_coord_location = glGetAttribLocation(program, "vTexCoord");
@@ -220,11 +219,6 @@ int main(int argv, char* args[])
     glEnableVertexAttribArray(vtex_coord_location);
     glVertexAttribPointer(vtex_coord_location, 2, GL_FLOAT, GL_FALSE,
                           sizeof(VertexData), (void*) (sizeof(float) * 3));
-
-    mat4x4 p;
-    mat4x4_perspective(p, 65 * M_PI / 180.0, 4 / 3, 1, 200);
-    glUseProgram(program);
-    glUniformMatrix4fv(p_location, 1, GL_FALSE, (const GLfloat*) p);
 
     uint32_t num_inputs = 4;
     uint32_t input_list[] = { GLFW_KEY_LEFT,
@@ -282,7 +276,7 @@ int main(int argv, char* args[])
         player_input_system.Update(delta_time);
         physics_system.Update(delta_time);
         animation_system.Update(delta_time);
-        render_system.Update(window, mv_location);
+        render_system.Update(window, mvp_location);
         collision_system.Update();
         ai_system.Update(delta_time);
         
@@ -348,7 +342,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     transform.scale[1] = 0;
     transform.scale[2] = 0;
 
-    quad_mesh.extent[0] = 5;
+    quad_mesh.extent[0] = 4;
     quad_mesh.extent[1] = 10000;
     
     texture.texture_id = road_texture;
@@ -356,7 +350,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     texture.size[1] = 2;
     texture.position[0] = 0;
     texture.position[1] = 0;
-    texture.extent[0] = 5;
+    texture.extent[0] = 4;
     texture.extent[1] = 10000;
 
     entity_number++;
@@ -371,7 +365,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
 
     for(uint32_t i = 0; i < 50; i++)
     {
-        transform.position[0] = (rand() % 5) - 2.5;
+        transform.position[0] = (rand() % 4) - 2;
         transform.position[1] = 0;
         transform.position[2] = -(rand() % 1000);
         transform.rotation[0] = 0;
@@ -536,11 +530,11 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     component_manager.AddComponent<Transform>(entity_number, transform);
     component_manager.AddComponent<QuadMesh>(entity_number, quad_mesh);
     component_manager.AddComponent<Texture>(entity_number, texture);
-    component_manager.AddComponent<BoundingBox>(entity_number, bounding_box);    
+    component_manager.AddComponent<BoundingBox>(entity_number, bounding_box);
     
     // Score Object    
-    transform.position[0] = -10;
-    transform.position[1] = 0;
+    transform.position[0] = 5;
+    transform.position[1] = 465;
     transform.position[2] = 0;
     transform.rotation[0] = 0;
     transform.rotation[1] = 0;
@@ -554,7 +548,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     label_texture.texture_size[0] = 800;
     label_texture.texture_size[1] = 200;
     label_texture.characters = new char[64];
-    snprintf(label_texture.characters, 64, "SCORE");
+    snprintf(label_texture.characters, 64, "SCORE ");
 
     entity_number++;
     entity_manager.SetEntitySignature(entity_number, HUD_RENDER_SYSTEM_SIGNATURE);

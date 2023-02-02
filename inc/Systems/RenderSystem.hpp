@@ -25,7 +25,7 @@ class RenderSystem : public System
     RenderSystem(MessageBus& message_bus);
     ~RenderSystem();
 
-    void Update(GLFWwindow* window, GLint mv_location);
+    void Update(GLFWwindow* window, GLint mvp_location);
     void handleMessage(Message message);
 
     private:
