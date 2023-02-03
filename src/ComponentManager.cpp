@@ -113,3 +113,15 @@ LabelTexture& ComponentManager::GetComponent<LabelTexture>(uint32_t entity_id)
 {
     return m_label_texture_pool.GetComponent(entity_id);
 }
+
+template <>
+void ComponentManager::AddComponent<Timer>(uint32_t entity_id, Timer component)
+{
+    m_timer_pool.AddComponent(entity_id, component);
+}
+
+template <>
+Timer& ComponentManager::GetComponent<Timer>(uint32_t entity_id)
+{
+    return m_timer_pool.GetComponent(entity_id);
+}

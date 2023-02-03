@@ -10,6 +10,7 @@
 #include "QuadMesh.hpp"
 #include "Animation.hpp"
 #include "LabelTexture.hpp"
+#include "Timer.hpp"
 
 class ComponentManager
 {
@@ -32,6 +33,7 @@ class ComponentManager
     ComponentPool<QuadMesh> m_quad_mesh_pool;
     ComponentPool<Animation> m_animation_pool;
     ComponentPool<LabelTexture> m_label_texture_pool;
+    ComponentPool<Timer> m_timer_pool;
 };
 
 #endif // COMPONENT_MANAGER_HPP

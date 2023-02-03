@@ -1,5 +1,6 @@
-#include "PlayerInputSystem.hpp"
+#include <cstdio>
 
+#include "PlayerInputSystem.hpp"
 
 PlayerInputSystem::PlayerInputSystem(MessageBus& message_bus, InputMap& input_map) : System(message_bus), m_input_map(input_map)
 {
@@ -108,6 +109,14 @@ void PlayerInputSystem::Update(float delta_time)
                 {
                     rigid_body.velocity[2] = -22;
                 }
+
+                if(-2 <= (transform.position[0] - 0.25) && (transform.position[0] + 0.25) <= 2)
+                {
+                    player_input.score += -rigid_body.velocity[2];
+                }
+                uint32_t score_entity_id = m_entity_manager->GetEntityId("score");
+                LabelTexture& label_texture = m_component_manager->GetComponent<LabelTexture>(score_entity_id);
+                snprintf(label_texture.characters, 64, "SCORE %d", player_input.score);
             }
             else if(player_input.state == PlayerState::DYING)
             {

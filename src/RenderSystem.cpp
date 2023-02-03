@@ -182,7 +182,7 @@ void RenderSystem::Update(GLFWwindow* window, GLint mvp_location)
     }
 
     const vec2 alpha_start_index_position = { 305, 183 };
-    const vec2 numeric_start_index_position = { 305, 197 };
+    const vec2 numeric_start_index_position = { 305, 166 };
     const vec2 character_extent = { 10, 11 };
     const uint32_t stride = 10;
 
@@ -198,7 +198,6 @@ void RenderSystem::Update(GLFWwindow* window, GLint mvp_location)
                                            { transform.position[0],                       transform.position[1]                       },
                                            { transform.position[0] + character_extent[0], transform.position[1] + character_extent[1] },
                                            { transform.position[0] + character_extent[0], transform.position[1]                       } };
-
             
             int width, height;
 

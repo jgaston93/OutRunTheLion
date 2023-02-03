@@ -232,7 +232,7 @@ int main(int argv, char* args[])
         input_map->AddInput(input_list[i]);
     }
     
-    const uint32_t num_entities = 55;
+    const uint32_t num_entities = 56;
     EntityManager entity_manager(num_entities);
     ComponentManager component_manager(num_entities);
     GenerateEntities(entity_manager, component_manager);
@@ -450,6 +450,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     player_input.rotation = -10;
     player_input.acceleration = -1.38;
     player_input.state = PlayerState::ALIVE;
+    player_input.score = 0;
 
     quad_mesh.extent[0] = 0.5;
     quad_mesh.extent[1] = 1;
@@ -553,7 +554,39 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     entity_number++;
     entity_manager.SetEntitySignature(entity_number, HUD_RENDER_SYSTEM_SIGNATURE);
     entity_manager.SetEntityState(entity_number, EntityState::ACTIVE);
+    entity_manager.SetEntityTag(entity_number, "score");
 
     component_manager.AddComponent<Transform>(entity_number, transform);
     component_manager.AddComponent<LabelTexture>(entity_number, label_texture);
+    
+    // Clock Object    
+    transform.position[0] = 310;
+    transform.position[1] = 465;
+    transform.position[2] = 0;
+    transform.rotation[0] = 0;
+    transform.rotation[1] = 0;
+    transform.rotation[2] = 0;
+    transform.scale[0] = 0;
+    transform.scale[1] = 0;
+    transform.scale[2] = 0;
+
+    label_texture;
+    label_texture.texture_id = big_sheet_texture;
+    label_texture.texture_size[0] = 800;
+    label_texture.texture_size[1] = 200;
+    label_texture.characters = new char[64];
+    snprintf(label_texture.characters, 64, "00");
+
+    Timer timer;
+    timer.time = 99;
+    timer.active = true;
+
+    entity_number++;
+    entity_manager.SetEntitySignature(entity_number, HUD_RENDER_SYSTEM_SIGNATURE);
+    entity_manager.SetEntityState(entity_number, EntityState::ACTIVE);
+    entity_manager.SetEntityTag(entity_number, "timer");
+
+    component_manager.AddComponent<Transform>(entity_number, transform);
+    component_manager.AddComponent<LabelTexture>(entity_number, label_texture);
+    component_manager.AddComponent<Timer>(entity_number, timer);
 }
