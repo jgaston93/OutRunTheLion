@@ -44,7 +44,7 @@ void CollisionSystem::Update()
                                     transform.position[1] + (bounding_box.extent[1] / 2) >= transform_2.position[1] - (bounding_box_2.extent[1] / 2) &&
                                     transform.position[2] - (bounding_box.extent[2] / 2) <= transform_2.position[2] + (bounding_box_2.extent[2] / 2) &&
                                     transform.position[2] + (bounding_box.extent[2] / 2) >= transform_2.position[2] - (bounding_box_2.extent[2] / 2);
-                    if(collision)
+                    if(collision && (strcmp("player", m_entity_manager->GetEntityTag(i)) == 0 || strcmp("player", m_entity_manager->GetEntityTag(j)) == 0))
                     {
                         Message message;
                         message.message_type = MessageType::COLLISION;

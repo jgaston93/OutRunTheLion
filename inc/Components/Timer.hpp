@@ -5,7 +5,7 @@
 
 struct Timer
 {
-    uint32_t time;
+    float time;
     bool active;
 };
 

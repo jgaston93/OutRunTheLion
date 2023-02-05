@@ -4,11 +4,11 @@
 #include "System.hpp"
 #include "Signatures.hpp"
 
-class Timer : public System
+class TimerSystem : public System
 {
     public:
-    Timer(MessageBus& message_bus);
-    ~Timer();
+    TimerSystem(MessageBus& message_bus);
+    ~TimerSystem();
 
     void Update(float delta_time);
     void handleMessage(Message message);

@@ -27,7 +27,7 @@ void AISystem::Update(float delta_time)
         {
             Transform& transform = m_component_manager->GetComponent<Transform>(i);
 
-            if((rand() % 100) < 20)
+            if((rand() % 100) < 15)
             {
                 transform.rotation[1] = (rand() % 60) - 30;
             }
@@ -38,7 +38,7 @@ void AISystem::Update(float delta_time)
             }
             else if(transform.position[0] > 2)
             {
-                transform.rotation[1] = (rand() % 15);
+                transform.rotation[1] = (rand() % 10);
             }
         }
     }

@@ -9,6 +9,10 @@ enum MessageType
     KEYPRESS,
     KEYRELEASE,
     COLLISION,
+    WIN,
+    LOSE,
+    TIMEOUT,
+    PLAYER_STOPPED,
 };
 
 struct Message

@@ -10,7 +10,10 @@ add_executable(OutRunTheLion main.cpp
                              RenderSystem.cpp
                              CollisionSystem.cpp
                              AnimationSystem.cpp
-                             AISystem.cpp)
+                             AISystem.cpp
+                             TimerSystem.cpp
+                             LifeCycleSystem.cpp
+                             BoundsSystem.cpp)
 
 target_include_directories(OutRunTheLion PUBLIC ${CMAKE_SOURCE_DIR}/inc
                                                 ${CMAKE_SOURCE_DIR}/inc/Components

@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+#include <cstdio>
 
 #include "RenderSystem.hpp"
 
@@ -44,10 +45,16 @@ void RenderSystem::Update(GLFWwindow* window, GLint mvp_location)
     {
         eye[0] = player_transform.position[0];
         eye[1] = player_transform.position[1] + 1;
-        eye[2] = player_transform.position[2] + 3;
+        eye[2] = player_transform.position[2] + 4;
         look[0] = player_transform.position[0];
         look[1] = player_transform.position[1] + 1;
-        look[2] = player_transform.position[2] - 3;
+        look[2] = player_transform.position[2] - 4;
+
+        if(player_input.state == PlayerState::DEAD)
+        {
+            eye[1] += 0.25;
+            look[1] += 0.25;
+        }
     }
 
     for(int i = 0; i < 2; i++)
@@ -166,7 +173,7 @@ void RenderSystem::Update(GLFWwindow* window, GLint mvp_location)
             
             // Perspective Matrix
             mat4x4 perspective_matrix;
-            mat4x4_perspective(perspective_matrix, 65 * M_PI / 180.0, 4 / 3, 1, 200);
+            mat4x4_perspective(perspective_matrix, 65 * M_PI / 180.0, 4 / 3, 1, 300);
 
             // Model View Perspective Matrix
             mat4x4 model_view_matrix;
@@ -194,10 +201,10 @@ void RenderSystem::Update(GLFWwindow* window, GLint mvp_location)
             Transform& transform = m_component_manager->GetComponent<Transform>(i);
             LabelTexture& label_texture = m_component_manager->GetComponent<LabelTexture>(i);
 
-            vec2 vertices_positions[4] = { { transform.position[0],                       transform.position[1] + character_extent[1] },
-                                           { transform.position[0],                       transform.position[1]                       },
-                                           { transform.position[0] + character_extent[0], transform.position[1] + character_extent[1] },
-                                           { transform.position[0] + character_extent[0], transform.position[1]                       } };
+            vec2 vertices_positions[4] = { { transform.position[0],                                            transform.position[1] + character_extent[1] * transform.scale[1] },
+                                           { transform.position[0],                                            transform.position[1]                       },
+                                           { transform.position[0] + character_extent[0] * transform.scale[0], transform.position[1] + character_extent[1] * transform.scale[1] },
+                                           { transform.position[0] + character_extent[0] * transform.scale[0], transform.position[1]                       } };
             
             int width, height;
 
@@ -231,16 +238,16 @@ void RenderSystem::Update(GLFWwindow* window, GLint mvp_location)
                     texture_start_index[1] = alpha_start_index_position[1];
                 }
 
-                vertices[0] = { 2.0f * (vertices_positions[0][0] + stride * i) / width - 1.0f, 2.0f * vertices_positions[0][1] / height - 1.0f, 0, 
+                vertices[0] = { 2.0f * (vertices_positions[0][0] + stride * i * transform.scale[0]) / width - 1.0f, 2.0f * vertices_positions[0][1] / height - 1.0f, 0, 
                                 texture_start_index[0] / label_texture.texture_size[0], (texture_start_index[1] + character_extent[1]) / label_texture.texture_size[1] };
                                 
-                vertices[1] = { 2.0f * (vertices_positions[1][0] + stride * i) / width - 1.0f, 2.0f * vertices_positions[1][1] / height - 1.0f, 0, 
+                vertices[1] = { 2.0f * (vertices_positions[1][0] + stride * i * transform.scale[0]) / width - 1.0f, 2.0f * vertices_positions[1][1] / height - 1.0f, 0, 
                                 texture_start_index[0] / label_texture.texture_size[0], texture_start_index[1] / label_texture.texture_size[1] };
 
-                vertices[2] = { 2.0f * (vertices_positions[2][0] + stride * i) / width - 1.0f, 2.0f * vertices_positions[2][1] / height - 1.0f, 0, 
+                vertices[2] = { 2.0f * (vertices_positions[2][0] + stride * i * transform.scale[0]) / width - 1.0f, 2.0f * vertices_positions[2][1] / height - 1.0f, 0, 
                                 (texture_start_index[0] + character_extent[0]) / label_texture.texture_size[0], (texture_start_index[1] + character_extent[1]) / label_texture.texture_size[1] };
                                 
-                vertices[3] = { 2.0f * (vertices_positions[3][0] + stride * i) / width - 1.0f, 2.0f * vertices_positions[3][1] / height - 1.0f, 0, 
+                vertices[3] = { 2.0f * (vertices_positions[3][0] + stride * i * transform.scale[0]) / width - 1.0f, 2.0f * vertices_positions[3][1] / height - 1.0f, 0, 
                                 (texture_start_index[0] + character_extent[0]) / label_texture.texture_size[0],  texture_start_index[1] / label_texture.texture_size[1] };
 
 

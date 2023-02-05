@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "MessageBus.hpp"
 
 MessageBus::MessageBus(uint32_t max_num_messages, uint32_t max_num_systems) : 
@@ -55,5 +57,9 @@ void MessageBus::postMessage(Message message)
         m_message_queue[m_message_queue_index++] = message;
         if(m_message_queue_index >= m_max_num_messages) m_message_queue_index = 0;
         m_num_messages++;
+    }
+    else
+    {
+        printf("TOO MANY MESSAGES\n");
     }
 }

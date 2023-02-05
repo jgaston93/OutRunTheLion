@@ -9,7 +9,7 @@ enum EntityState
     ACTIVE,
 };
 
-const uint32_t tag_length = 10; // includes null terminator
+const uint32_t tag_length = 64; // includes null terminator
 
 class EntityManager
 {
