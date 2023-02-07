@@ -13,7 +13,7 @@ Requiremets: CMake, MinGW, GLFW
 1. Download [MinGW](https://github.com/niXman/mingw-builds-binaries/releases). I usually use [this one](https://github.com/niXman/mingw-builds-binaries/releases/download/12.2.0-rt_v10-rev2/x86_64-12.2.0-release-posix-seh-msvcrt-rt_v10-rev2.7z).
 2. Unzip and move the **mingw64** folder to **C:\\** or wherever else you want to put it.
 3. Add **C:\mingw64\bin** to your **Path** environment variable.
-4. For convenience, in the **C:\mingw64\bin** direecotry, I usually create a copy of **mingw32-make.exe** and rename to **make.exe**.
+4. For convenience, in the **C:\mingw64\bin** directory, I usually create a copy of **mingw32-make.exe** and rename to **make.exe**.
 
 #### GLFW
 1. Dowload source package of [GLFW](https://www.glfw.org/download.html)
