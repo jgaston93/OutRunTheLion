@@ -40,6 +40,7 @@ void LifeCycleSystem::handleMessage(Message message)
         Transform& lion_transform = m_component_manager->GetComponent<Transform>(lion_id);
         RigidBody& lion_rigid_body = m_component_manager->GetComponent<RigidBody>(lion_id);
         Texture& lion_texture = m_component_manager->GetComponent<Texture>(lion_id);
+        Animation& animation = m_component_manager->GetComponent<Animation>(lion_id);
 
         uint32_t player_id = m_entity_manager->GetEntityId("player");
         Transform& player_transform = m_component_manager->GetComponent<Transform>(player_id);
@@ -51,6 +52,7 @@ void LifeCycleSystem::handleMessage(Message message)
         lion_rigid_body.velocity[1] = 0;
         lion_rigid_body.velocity[2] = 0;
         lion_texture.position[1] = 75;
+        animation.speed = 0.25;
     }
     else if(message.message_type == MessageType::COLLISION)
     {
@@ -72,7 +74,9 @@ void LifeCycleSystem::handleMessage(Message message)
         {
             RigidBody& rigid_body = m_component_manager->GetComponent<RigidBody>(lion_id);
             Texture& texture = m_component_manager->GetComponent<Texture>(lion_id);
+            Animation& animation = m_component_manager->GetComponent<Animation>(lion_id);
 
+            animation.speed = 1;
             rigid_body.velocity[0] = 0;
             texture.position[1] = 0;
         }
@@ -117,9 +121,12 @@ void LifeCycleSystem::Update()
             Texture& texture = m_component_manager->GetComponent<Texture>(player_id);
             QuadMesh& quad_mesh = m_component_manager->GetComponent<QuadMesh>(player_id);
             Timer& timer = m_component_manager->GetComponent<Timer>(timer_id);
+            Animation& animation = m_component_manager->GetComponent<Animation>(lion_id);
+
+            animation.speed = 1;
 
             timer.active = true;
-            timer.time = 99;
+            timer.time = 60;
             
             player_input.score = 0;
             player_input.state = PlayerState::ALIVE;

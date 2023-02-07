@@ -25,6 +25,12 @@
 #include "LifeCycleSystem.hpp"
 #include "BoundsSystem.hpp"
 
+#include "Textures/antelope_texture.h"
+#include "Textures/big_sheet_texture.h"
+#include "Textures/grass_texture.h"
+#include "Textures/lion_texture.h"
+#include "Textures/road_texture.h"
+
 static const char* vertex_shader_text =
 "#version 130\n"
 "uniform mat4 MVP;\n"
@@ -116,11 +122,8 @@ int main(int argv, char* args[])
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("../assets/grass_texture.jpg", &width, &height, &nrChannels, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, grass_texture_width, grass_texture_width, 0, GL_RGB, GL_UNSIGNED_BYTE, grass_texture_data);
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
 
     glGenTextures(1, &road_texture);
     glBindTexture(GL_TEXTURE_2D, road_texture);
@@ -129,11 +132,9 @@ int main(int argv, char* args[])
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    
-    data = stbi_load("../assets/road_texture.jpg", &width, &height, &nrChannels, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, road_texture_width, road_texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, road_texture_data);
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
 
     glGenTextures(1, &antelope_texture);
     glBindTexture(GL_TEXTURE_2D, antelope_texture);
@@ -142,12 +143,9 @@ int main(int argv, char* args[])
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    
-    stbi_set_flip_vertically_on_load(true);
-    data = stbi_load("../assets/antelope_texture.png", &width, &height, &nrChannels, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, antelope_texture_width, antelope_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, antelope_texture_data);
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
 
     glGenTextures(1, &big_sheet_texture);
     glBindTexture(GL_TEXTURE_2D, big_sheet_texture);
@@ -157,11 +155,8 @@ int main(int argv, char* args[])
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
-    stbi_set_flip_vertically_on_load(true);
-    data = stbi_load("../assets/big_sheet_texture.png", &width, &height, &nrChannels, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, big_sheet_texture_width, big_sheet_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, big_sheet_texture_data);
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
 
     glGenTextures(1, &lion_texture);
     glBindTexture(GL_TEXTURE_2D, lion_texture);
@@ -171,11 +166,8 @@ int main(int argv, char* args[])
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
-    stbi_set_flip_vertically_on_load(true);
-    data = stbi_load("../assets/lion_texture.png", &width, &height, &nrChannels, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lion_texture_width, lion_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, lion_texture_data);
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
  
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
@@ -817,7 +809,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     snprintf(label_texture.characters, 64, "00");
 
     Timer timer;
-    timer.time = 99;
+    timer.time = 60;
     timer.active = true;
 
     entity_number++;
@@ -831,7 +823,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
 
     // Game Over Text Object    
     transform.position[0] = 185;
-    transform.position[1] = 210;
+    transform.position[1] = 305;
     transform.position[2] = 0;
     transform.rotation[0] = 0;
     transform.rotation[1] = 0;
@@ -857,7 +849,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
 
     // Win Text Object    
     transform.position[0] = 275;
-    transform.position[1] = 225;
+    transform.position[1] = 305;
     transform.position[2] = 0;
     transform.rotation[0] = 0;
     transform.rotation[1] = 0;
@@ -1060,7 +1052,7 @@ void GenerateEntities(EntityManager& entity_manager, ComponentManager& component
     animation.current_frame = 0;
     animation.num_frames = 2;
     animation.counter = 0;
-    animation.speed = 1;
+    animation.speed = 0.25;
     
     bounding_box.extent[0] = 2;
     bounding_box.extent[1] = 1.5;

@@ -21,4 +21,5 @@ target_include_directories(OutRunTheLion PUBLIC ${CMAKE_SOURCE_DIR}/inc
                                                 ${CMAKE_SOURCE_DIR}/inc/Utils
                                                 ${CMAKE_SOURCE_DIR}/inc/MessageBus)
 
+target_link_options(OutRunTheLion PUBLIC -mwindows -static-libgcc -static-libstdc++ -static)
 target_link_libraries(OutRunTheLion glfw OpenGL::GL)
