@@ -1,3 +1,6 @@
+set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_SOURCE_DIR}/assets/appicon.rc")
+
+
 add_executable(OutRunTheLion main.cpp
                              gl.c
                              MessageBus.cpp
@@ -13,7 +16,8 @@ add_executable(OutRunTheLion main.cpp
                              AISystem.cpp
                              TimerSystem.cpp
                              LifeCycleSystem.cpp
-                             BoundsSystem.cpp)
+                             BoundsSystem.cpp
+                             ${APP_ICON_RESOURCE_WINDOWS})
 
 target_include_directories(OutRunTheLion PUBLIC ${CMAKE_SOURCE_DIR}/inc
                                                 ${CMAKE_SOURCE_DIR}/inc/Components
